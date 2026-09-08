@@ -13,7 +13,7 @@ jobs:
       - name: Get repository
         uses: actions/checkout@v4
 
-      - name: Create today's video page
+      - name: Test automation
         run: |
           echo "Daily AI Video automation is running!"
           date

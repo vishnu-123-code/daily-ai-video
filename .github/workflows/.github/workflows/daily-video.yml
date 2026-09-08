@@ -1,0 +1,19 @@
+name: Daily AI Video
+
+on:
+  schedule:
+    - cron: "30 3 * * *"
+  workflow_dispatch:
+
+jobs:
+  create-video:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get repository
+        uses: actions/checkout@v4
+
+      - name: Create today's video page
+        run: |
+          echo "Daily AI Video automation is running!"
+          date

@@ -5,15 +5,43 @@ on:
     - cron: "30 3 * * *"
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   create-video:
     runs-on: ubuntu-latest
 
     steps:
       - name: Get repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Test automation
+      - name: Create today's video page
         run: |
-          echo "Daily AI Video automation is running!"
-          date
+          mkdir -p videos
+
+          DATE=$(date -u +"%Y-%m-%d")
+
+          cat > videos/$DATE.html <<EOF
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <title>Daily AI Video - $DATE</title>
+          </head>
+          <body>
+            <h1>🎬 Daily AI Video</h1>
+            <h2>Today's Video - $DATE</h2>
+            <p>🤖 This video was automatically created by GitHub Actions.</p>
+            <p>More AI-generated content coming soon!</p>
+          </body>
+          </html>
+          EOF
+
+      - name: Save today's video page
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add videos/
+          git commit -m "Create daily video for $(date -u +'%Y-%m-%d')" || echo "Nothing to commit"
+          git push

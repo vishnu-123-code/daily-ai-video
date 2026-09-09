@@ -2,6 +2,14 @@ import subprocess
 from datetime import datetime
 from pathlib import Path
 
+import soundfile as sf
+from kokoro_onnx import Kokoro
+
+
+# --------------------------------------------------
+# 1. BASIC SETTINGS
+# --------------------------------------------------
+
 today = datetime.now().strftime("%Y-%m-%d")
 
 videos = Path("videos")
@@ -9,10 +17,22 @@ videos.mkdir(exist_ok=True)
 
 output = videos / f"{today}.mp4"
 
-print("🎬 Creating today's Daily AI Video...")
+print("🎬 Creating Daily AI Video...")
+print("🎙️ Voice: Kokoro Adam (am_adam)")
+
 
 # --------------------------------------------------
-# 1. SCRIPT
+# 2. LOAD KOKORO
+# --------------------------------------------------
+
+kokoro = Kokoro(
+    "kokoro-v1.0.int8.onnx",
+    "voices-v1.0.bin"
+)
+
+
+# --------------------------------------------------
+# 3. VIDEO SCRIPT
 # --------------------------------------------------
 
 scenes = [
@@ -23,33 +43,34 @@ scenes = [
     },
     {
         "title": "AMAZING FACT",
-        "text": "Sunlight takes about 8 minutes",
-        "voice": "Sunlight takes about eight minutes"
+        "text": "Sunlight takes about 8 minutes.",
+        "voice": "Sunlight takes about eight minutes."
     },
     {
         "title": "TO REACH EARTH",
-        "text": "and 20 seconds to reach Earth.",
-        "voice": "and twenty seconds to reach Earth."
+        "text": "And 20 seconds to reach Earth.",
+        "voice": "And twenty seconds to reach Earth."
     },
     {
         "title": "THINK ABOUT THIS",
-        "text": "When you see the Sun,",
-        "voice": "When you see the Sun,"
+        "text": "When you see the Sun...",
+        "voice": "When you see the Sun..."
     },
     {
         "title": "YOU ARE SEEING THE PAST",
-        "text": "you are seeing it as it was",
-        "voice": "you are seeing it as it was"
+        "text": "You are seeing it as it was.",
+        "voice": "You are seeing it as it was."
     },
     {
         "title": "8 MINUTES AGO",
-        "text": "more than 8 minutes ago.",
-        "voice": "more than eight minutes ago."
+        "text": "More than 8 minutes ago.",
+        "voice": "More than eight minutes ago."
     }
 ]
 
+
 # --------------------------------------------------
-# 2. CREATE VIDEO PARTS
+# 4. CREATE EACH SCENE
 # --------------------------------------------------
 
 parts = []
@@ -60,20 +81,23 @@ for i, scene in enumerate(scenes, start=1):
     image = Path(f"scene{i}.png")
     video = Path(f"part{i}.mp4")
 
-    print(f"🎙️ Creating narration {i}...")
+    print(f"🎙️ Creating Adam narration {i}...")
 
-    # Create clear, slower narration
-    subprocess.run([
-        "espeak-ng",
-        "-w", str(audio),
-        "-s", "125",
-        "-p", "50",
-        "-a", "180",
-        "-v", "en-us",
-        scene["voice"]
-    ], check=True)
+    # Generate AI voice with Kokoro Adam
+    samples, sample_rate = kokoro.create(
+        scene["voice"],
+        voice="am_adam",
+        speed=0.95,
+        lang="en-us"
+    )
 
-    # Get audio duration
+    # Save narration
+    sf.write(str(audio), samples, sample_rate)
+
+    # --------------------------------------------------
+    # GET AUDIO DURATION
+    # --------------------------------------------------
+
     result = subprocess.run(
         [
             "ffprobe",
@@ -91,7 +115,11 @@ for i, scene in enumerate(scenes, start=1):
 
     print(f"⏱️ Scene {i}: {duration:.2f} seconds")
 
-    # Create vertical 9:16 image
+
+    # --------------------------------------------------
+    # CREATE VERTICAL IMAGE
+    # --------------------------------------------------
+
     subprocess.run([
         "ffmpeg", "-y",
         "-f", "lavfi",
@@ -105,21 +133,23 @@ for i, scene in enumerate(scenes, start=1):
             "fontcolor=white:"
             "fontsize=48:"
             "x=(w-text_w)/2:"
-            "y=400:"
-            "text_align=center,"
+            "y=400,"
             "drawtext=text='"
             + scene["text"]
             + "':"
             "fontcolor=white:"
             "fontsize=38:"
             "x=(w-text_w)/2:"
-            "y=620:"
-            "text_align=center"
+            "y=620"
         ),
         str(image)
     ], check=True)
 
-    # Make video exactly as long as narration
+
+    # --------------------------------------------------
+    # CREATE VIDEO WITH ADAM AUDIO
+    # --------------------------------------------------
+
     subprocess.run([
         "ffmpeg", "-y",
         "-loop", "1",
@@ -136,11 +166,12 @@ for i, scene in enumerate(scenes, start=1):
 
     parts.append(video)
 
+
 # --------------------------------------------------
-# 3. JOIN ALL SCENES
+# 5. JOIN ALL SCENES
 # --------------------------------------------------
 
-print("🎬 Joining scenes...")
+print("🎬 Joining all scenes...")
 
 scenes_file = Path("scenes.txt")
 
@@ -157,10 +188,12 @@ subprocess.run([
     str(output)
 ], check=True)
 
+
 print(f"✅ VIDEO CREATED: {output}")
 
+
 # --------------------------------------------------
-# 4. CLEAN TEMPORARY FILES
+# 6. CLEAN TEMPORARY FILES
 # --------------------------------------------------
 
 for i in range(1, len(scenes) + 1):

@@ -8,126 +8,173 @@ videos = Path("videos")
 videos.mkdir(exist_ok=True)
 
 output = videos / f"{today}.mp4"
-audio = Path("narration.wav")
 
-print("🎬 Creating today's short video...")
+print("🎬 Creating today's Daily AI Video...")
 
-# Narration
-narration = (
-    "Welcome to Daily AI Video. "
-    "Did you know that the light from the Sun takes about eight minutes "
-    "and twenty seconds to reach Earth? "
-    "That means when you look at the Sun, you are seeing it as it was "
-    "more than eight minutes ago. "
-    "Follow Daily AI Video for a new interesting fact every day."
-)
+# --------------------------------------------------
+# 1. SCRIPT
+# --------------------------------------------------
 
-subprocess.run([
-    "espeak-ng",
-    "-w", str(audio),
-    "-s", "145",
-    "-v", "en",
-    narration
-], check=True)
+scenes = [
+    {
+        "title": "DID YOU KNOW?",
+        "text": "The Sun is very far away.",
+        "voice": "The Sun is very far away."
+    },
+    {
+        "title": "AMAZING FACT",
+        "text": "Sunlight takes about 8 minutes",
+        "voice": "Sunlight takes about eight minutes"
+    },
+    {
+        "title": "TO REACH EARTH",
+        "text": "and 20 seconds to reach Earth.",
+        "voice": "and twenty seconds to reach Earth."
+    },
+    {
+        "title": "THINK ABOUT THIS",
+        "text": "When you see the Sun,",
+        "voice": "When you see the Sun,"
+    },
+    {
+        "title": "YOU ARE SEEING THE PAST",
+        "text": "you are seeing it as it was",
+        "voice": "you are seeing it as it was"
+    },
+    {
+        "title": "8 MINUTES AGO",
+        "text": "more than 8 minutes ago.",
+        "voice": "more than eight minutes ago."
+    }
+]
 
-# Scene 1
-scene1 = Path("scene1.png")
-subprocess.run([
-    "ffmpeg", "-y",
-    "-f", "lavfi",
-    "-i", "color=c=0x111827:s=1280x720",
-    "-frames:v", "1",
-    "-vf",
-    "drawtext=text='DAILY AI VIDEO':"
-    "fontcolor=white:fontsize=70:"
-    "x=(w-text_w)/2:y=220,"
-    "drawtext=text='Amazing Space Fact':"
-    "fontcolor=white:fontsize=48:"
-    "x=(w-text_w)/2:y=340",
-    str(scene1)
-], check=True)
+# --------------------------------------------------
+# 2. CREATE VIDEO PARTS
+# --------------------------------------------------
 
-# Scene 2
-scene2 = Path("scene2.png")
-subprocess.run([
-    "ffmpeg", "-y",
-    "-f", "lavfi",
-    "-i", "color=c=0x172554:s=1280x720",
-    "-frames:v", "1",
-    "-vf",
-    "drawtext=text='THE SUN':"
-    "fontcolor=yellow:fontsize=80:"
-    "x=(w-text_w)/2:y=180,"
-    "drawtext=text='☀':"
-    "fontcolor=yellow:fontsize=150:"
-    "x=(w-text_w)/2:y=300",
-    str(scene2)
-], check=True)
+parts = []
 
-# Scene 3
-scene3 = Path("scene3.png")
-subprocess.run([
-    "ffmpeg", "-y",
-    "-f", "lavfi",
-    "-i", "color=c=0x0f172a:s=1280x720",
-    "-frames:v", "1",
-    "-vf",
-    "drawtext=text='8 MINUTES 20 SECONDS':"
-    "fontcolor=white:fontsize=65:"
-    "x=(w-text_w)/2:y=220,"
-    "drawtext=text='Sunlight takes this long to reach Earth':"
-    "fontcolor=white:fontsize=38:"
-    "x=(w-text_w)/2:y=340",
-    str(scene3)
-], check=True)
+for i, scene in enumerate(scenes, start=1):
 
-# Create each scene as a 4-second video
-for number in range(1, 4):
+    audio = Path(f"audio{i}.wav")
+    image = Path(f"scene{i}.png")
+    video = Path(f"part{i}.mp4")
+
+    print(f"🎙️ Creating narration {i}...")
+
+    # Create clear, slower narration
+    subprocess.run([
+        "espeak-ng",
+        "-w", str(audio),
+        "-s", "125",
+        "-p", "50",
+        "-a", "180",
+        "-v", "en-us",
+        scene["voice"]
+    ], check=True)
+
+    # Get audio duration
+    result = subprocess.run(
+        [
+            "ffprobe",
+            "-v", "error",
+            "-show_entries", "format=duration",
+            "-of", "default=noprint_wrappers=1:nokey=1",
+            str(audio)
+        ],
+        capture_output=True,
+        text=True,
+        check=True
+    )
+
+    duration = float(result.stdout.strip()) + 0.4
+
+    print(f"⏱️ Scene {i}: {duration:.2f} seconds")
+
+    # Create vertical 9:16 image
+    subprocess.run([
+        "ffmpeg", "-y",
+        "-f", "lavfi",
+        "-i", "color=c=0x111827:s=720x1280",
+        "-frames:v", "1",
+        "-vf",
+        (
+            "drawtext=text='"
+            + scene["title"]
+            + "':"
+            "fontcolor=white:"
+            "fontsize=48:"
+            "x=(w-text_w)/2:"
+            "y=400:"
+            "text_align=center,"
+            "drawtext=text='"
+            + scene["text"]
+            + "':"
+            "fontcolor=white:"
+            "fontsize=38:"
+            "x=(w-text_w)/2:"
+            "y=620:"
+            "text_align=center"
+        ),
+        str(image)
+    ], check=True)
+
+    # Make video exactly as long as narration
     subprocess.run([
         "ffmpeg", "-y",
         "-loop", "1",
-        "-i", f"scene{number}.png",
-        "-t", "4",
+        "-i", str(image),
+        "-i", str(audio),
+        "-t", str(duration),
         "-r", "30",
+        "-c:v", "libx264",
+        "-c:a", "aac",
         "-pix_fmt", "yuv420p",
-        f"part{number}.mp4"
+        "-shortest",
+        str(video)
     ], check=True)
 
-# Join the scenes
-Path("scenes.txt").write_text(
-    "file 'part1.mp4'\n"
-    "file 'part2.mp4'\n"
-    "file 'part3.mp4'\n"
-)
+    parts.append(video)
+
+# --------------------------------------------------
+# 3. JOIN ALL SCENES
+# --------------------------------------------------
+
+print("🎬 Joining scenes...")
+
+scenes_file = Path("scenes.txt")
+
+with open(scenes_file, "w") as f:
+    for part in parts:
+        f.write(f"file '{part}'\n")
 
 subprocess.run([
     "ffmpeg", "-y",
     "-f", "concat",
     "-safe", "0",
-    "-i", "scenes.txt",
+    "-i", str(scenes_file),
     "-c", "copy",
-    "visual.mp4"
-], check=True)
-
-# Add narration
-subprocess.run([
-    "ffmpeg", "-y",
-    "-i", "visual.mp4",
-    "-i", str(audio),
-    "-c:v", "copy",
-    "-c:a", "aac",
-    "-shortest",
     str(output)
 ], check=True)
 
-print(f"✅ Finished: {output}")
+print(f"✅ VIDEO CREATED: {output}")
 
-# Clean temporary files
-for file in [
-    audio, scene1, scene2, scene3,
-    Path("part1.mp4"), Path("part2.mp4"),
-    Path("part3.mp4"), Path("visual.mp4"),
-    Path("scenes.txt")
-]:
-    if file.exists():
-        file.unlink()
+# --------------------------------------------------
+# 4. CLEAN TEMPORARY FILES
+# --------------------------------------------------
+
+for i in range(1, len(scenes) + 1):
+
+    for file in [
+        Path(f"audio{i}.wav"),
+        Path(f"scene{i}.png"),
+        Path(f"part{i}.mp4")
+    ]:
+        if file.exists():
+            file.unlink()
+
+if scenes_file.exists():
+    scenes_file.unlink()
+
+print("🧹 Temporary files cleaned.")
+print("🎉 Daily AI Video completed successfully!")

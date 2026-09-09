@@ -3,66 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Daily AI Video</title>
 
     <style>
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: #111;
+            background: #0f172a;
             color: white;
+            font-family: Arial, sans-serif;
             text-align: center;
         }
 
-        header {
-            padding: 30px 20px;
+        .container {
+            max-width: 700px;
+            margin: auto;
+            padding: 30px 15px;
         }
 
         h1 {
-            margin-bottom: 10px;
+            font-size: 32px;
+            margin-bottom: 8px;
         }
 
-        .video-box {
-            width: 90%;
-            max-width: 500px;
-            margin: 20px auto;
-            background: #222;
-            border-radius: 15px;
-            padding: 20px;
+        p {
+            color: #cbd5e1;
         }
 
         video {
             width: 100%;
-            border-radius: 10px;
+            max-width: 450px;
+            border-radius: 18px;
+            margin-top: 25px;
             background: black;
         }
 
-        .message {
-            color: #aaa;
-            margin-top: 20px;
+        .date {
+            margin-top: 15px;
+            color: #94a3b8;
         }
     </style>
 </head>
 
 <body>
 
-    <header>
+    <div class="container">
+
         <h1>🎬 Daily AI Video</h1>
-        <p>A new AI-generated video every day</p>
-    </header>
 
-    <div class="video-box">
+        <p>One new AI-generated video every day</p>
 
-        <video controls>
-            <source src="" type="video/mp4">
-            Your browser does not support video.
+        <video id="dailyVideo" controls playsinline>
+            Your browser does not support video playback.
         </video>
 
-        <p class="message">
-            Today's AI video will appear here.
-        </p>
+        <div class="date" id="dateText"></div>
 
     </div>
+
+    <script>
+        // Get today's date
+        const today = new Date();
+
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, "0");
+        const day = String(today.getDate()).padStart(2, "0");
+
+        const fileName = `${year}-${month}-${day}.mp4`;
+
+        // GitHub Pages video location
+        const videoPath = `videos/${fileName}`;
+
+        // Put today's video into the player
+        const video = document.getElementById("dailyVideo");
+
+        video.src = videoPath;
+
+        // Show today's date
+        document.getElementById("dateText").textContent =
+            `Today's video: ${fileName}`;
+    </script>
 
 </body>
 </html>

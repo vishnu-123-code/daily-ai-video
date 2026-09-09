@@ -26,9 +26,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ffmpeg
 
-      - name: Install narration software
+      - name: Install Kokoro TTS
         run: |
-          sudo apt-get install -y espeak-ng
+          pip install -U kokoro-onnx soundfile
+
+      - name: Download Kokoro model
+        run: |
+          wget -q https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/kokoro-v1.0.int8.onnx
+          wget -q https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/voices-v1.0.bin
 
       - name: Create today's video
         run: |

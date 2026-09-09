@@ -16,32 +16,19 @@ jobs:
       - name: Get repository
         uses: actions/checkout@v6
 
-      - name: Create today's video page
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Run video generator
         run: |
-          mkdir -p videos
+          python scripts/create_video.py
 
-          DATE=$(date -u +"%Y-%m-%d")
-
-          cat > videos/$DATE.html <<EOF
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <meta charset="UTF-8">
-            <title>Daily AI Video - $DATE</title>
-          </head>
-          <body>
-            <h1>🎬 Daily AI Video</h1>
-            <h2>Today's Video - $DATE</h2>
-            <p>🤖 This video was automatically created by GitHub Actions.</p>
-            <p>More AI-generated content coming soon!</p>
-          </body>
-          </html>
-          EOF
-
-      - name: Save today's video page
+      - name: Save changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add videos/
-          git commit -m "Create daily video for $(date -u +'%Y-%m-%d')" || echo "Nothing to commit"
+          git add .
+          git commit -m "Run daily AI video generator" || echo "Nothing to commit"
           git push

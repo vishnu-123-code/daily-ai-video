@@ -62,7 +62,6 @@
     </div>
 
     <script>
-        // Get today's date
         const today = new Date();
 
         const year = today.getFullYear();
@@ -71,15 +70,12 @@
 
         const fileName = `${year}-${month}-${day}.mp4`;
 
-        // GitHub Pages video location
         const videoPath = `videos/${fileName}`;
 
-        // Put today's video into the player
         const video = document.getElementById("dailyVideo");
 
         video.src = videoPath;
 
-        // Show today's date
         document.getElementById("dateText").textContent =
             `Today's video: ${fileName}`;
     </script>

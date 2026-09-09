@@ -26,6 +26,10 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ffmpeg
 
+      - name: Install narration software
+        run: |
+          sudo apt-get install -y espeak-ng
+
       - name: Create today's video
         run: |
           python scripts/create_video.py

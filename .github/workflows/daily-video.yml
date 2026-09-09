@@ -21,14 +21,19 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Run video generator
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
+      - name: Create today's video
         run: |
           python scripts/create_video.py
 
-      - name: Save changes
+      - name: Save video
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .
-          git commit -m "Run daily AI video generator" || echo "Nothing to commit"
+          git add videos/
+          git commit -m "Add daily video" || echo "Nothing to commit"
           git push

@@ -1,0 +1,54 @@
+{
+  "episodes": [
+    {
+      "episode": 1,
+      "title": "Shantanu and Ganga",
+      "story": "King Shantanu of Hastinapura meets the mysterious Ganga and falls in love with her. Ganga agrees to marry him on one condition: he must never question anything she does."
+    },
+    {
+      "episode": 2,
+      "title": "The Seven Sons",
+      "story": "Ganga gives birth to seven sons, but each time she immediately takes the newborn to the river. Shantanu is heartbroken but keeps his promise and remains silent."
+    },
+    {
+      "episode": 3,
+      "title": "Devavrata Is Born",
+      "story": "When Ganga is about to take their eighth son to the river, Shantanu finally stops her. Ganga reveals the truth and takes the child, Devavrata, with her to raise him."
+    },
+    {
+      "episode": 4,
+      "title": "Devavrata Returns",
+      "story": "Years later, Ganga returns Devavrata to Shantanu. Devavrata is now a brilliant warrior and prince, ready to serve Hastinapura."
+    },
+    {
+      "episode": 5,
+      "title": "Satyavati",
+      "story": "Shantanu falls in love with Satyavati, but her father demands that her future son must become king. Devavrata learns about this condition."
+    },
+    {
+      "episode": 6,
+      "title": "The Great Vow",
+      "story": "Devavrata gives up his claim to the throne and makes a lifelong vow never to marry or have children. Shantanu gives him the name Bhishma."
+    },
+    {
+      "episode": 7,
+      "title": "The Kuru Family",
+      "story": "Satyavati's sons Chitrangada and Vichitravirya become connected to the future of the Kuru dynasty. Bhishma continues protecting Hastinapura."
+    },
+    {
+      "episode": 8,
+      "title": "Dhritarashtra, Pandu and Vidura",
+      "story": "After difficult events in the Kuru family, Dhritarashtra, Pandu and Vidura are born. Their different abilities will shape the future of Hastinapura."
+    },
+    {
+      "episode": 9,
+      "title": "The Princes Grow",
+      "story": "Dhritarashtra grows strong but is blind from birth. Pandu becomes a skilled warrior, while Vidura becomes known for his wisdom and knowledge of dharma."
+    },
+    {
+      "episode": 10,
+      "title": "Pandu Becomes King",
+      "story": "Because Dhritarashtra is blind, Pandu becomes king of Hastinapura. The Kuru family enters a new chapter."
+    }
+  ]
+}

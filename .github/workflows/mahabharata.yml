@@ -1,0 +1,41 @@
+name: Mahabharata Daily Videos
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 3 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: Generate 3 Mahabharata episodes
+        run: |
+          python scripts/mahabharata_generator.py
+
+      - name: Commit generated videos and state
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/state.json videos/
+          git diff --cached --quiet || git commit -m "Generate Mahabharata episodes"
+          git push
